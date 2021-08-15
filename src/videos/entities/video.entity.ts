@@ -1,6 +1,7 @@
-import { PrimaryGeneratedColumn, Column } from 'typeorm';
+import { PrimaryGeneratedColumn, Column, Entity } from 'typeorm';
 import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
+@Entity()
 export class Video {
   @PrimaryGeneratedColumn()
   id: number;
@@ -8,12 +9,12 @@ export class Video {
   @IsNotEmpty()
   @IsString()
   @Column()
-  title: string;
+  titulo: string;
 
   @IsNotEmpty()
   @IsString()
   @Column()
-  description: string;
+  descricao: string;
 
   @IsNotEmpty()
   @IsUrl()
