@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Like, Repository } from 'typeorm';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { Video } from './entities/video.entity';
@@ -11,11 +11,19 @@ export class VideosService {
   private videoRepository: Repository<Video>;
 
   create(createVideoDto: CreateVideoDto) {
+    if (!createVideoDto.categoria)
+      return this.videoRepository.save({
+        ...createVideoDto,
+        categoria: { id: 1 },
+      });
     return this.videoRepository.save(createVideoDto);
   }
 
-  findAll() {
-    return this.videoRepository.find();
+  findAll(search = '') {
+    return this.videoRepository.find({
+      where: { titulo: ILike(`%${search}%`) },
+      relations: ['categoria'],
+    });
   }
 
   findOne(id: number) {
