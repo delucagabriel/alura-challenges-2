@@ -23,7 +23,11 @@ export class VideosController {
 
   @Get()
   findAll(@Query() query) {
-    return this.videosService.findAll(query.search);
+    query.limit = query.limit > 5 ? 5 : query.limit;
+    return this.videosService.findAll(query.search, {
+      page: query.page,
+      limit: query.limit,
+    });
   }
 
   @Get(':id')

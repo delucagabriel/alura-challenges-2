@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Like, Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { Video } from './entities/video.entity';
@@ -19,11 +19,23 @@ export class VideosService {
     return this.videoRepository.save(createVideoDto);
   }
 
-  findAll(search = '') {
-    return this.videoRepository.find({
+  async findAll(search = '', options) {
+    const skippedItems = (+options.page - 1) * +options.limit;
+    const [result, total] = await this.videoRepository.findAndCount({
+      skip: skippedItems,
+      take: +options.limit,
       where: { titulo: ILike(`%${search}%`) },
       relations: ['categoria'],
     });
+
+    return {
+      data: result,
+      totalCount: total,
+      pages: Math.ceil(
+        total / (+options.limit > total ? total : +options.limit),
+      ),
+      currentPage: +options.page || 1,
+    };
   }
 
   findOne(id: number) {
